@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedToken = localStorage.getItem("token");
     const localRole = localStorage.getItem("role");
     if (storedToken && localRole) {
-      console.log("got role form localsotrage:", localRole);
+      console.log("got role form localstorage:", localRole);
       authenticateUser(storedToken, Role.admin);
     }
     setIsInitialCheckComplete(true);

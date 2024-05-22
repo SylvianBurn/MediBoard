@@ -2,7 +2,7 @@ import { Close, Save } from "@mui/icons-material";
 import { Button, TextField, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-interface UserEditModalProps {
+interface PatientModalProps {
   title: string;
   fullName: string;
   email: string;
@@ -16,7 +16,7 @@ interface UserEditModalProps {
   isEdit?: boolean;
 }
 
-const UserModal = ({
+const PatientModal = ({
   title,
   fullName,
   email,
@@ -28,7 +28,7 @@ const UserModal = ({
   onSave,
   onCancel,
   isEdit = false,
-}: UserEditModalProps) => {
+}: PatientModalProps) => {
   return (
     <div
       style={{
@@ -178,4 +178,4 @@ const UserModal = ({
   );
 };
 
-export default UserModal;
+export default PatientModal;

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { createPatient } from "../utils/api";
 import PatientData from "../interface/PatientData";
 import { useAuth } from "../utils/ProtectedRoute";
+import PatientModal from "./PatientModal";
 
 type CreatePatientModalProps = {
   isOpen: boolean;
@@ -37,11 +38,18 @@ export default function CreatePatientModal({
 
   const onCreateSave = () => {
     setLoading(true);
-    console.log('patient to create:', patient);
+    console.log("patient to create:", patient);
     createPatient(patient.fullName, patient.email, patient.birthDate)
       .then(() => {
         onClose();
         setPatient({ id: 0, fullName: "", email: "", birthDate: "" });
+      })
+      .catch((error) => {
+        console.log('err:', error);
+        if (error.errors[0].message === "Unauthorized access") {
+          signOut();
+          navigate("/login");
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -68,7 +76,7 @@ export default function CreatePatientModal({
         alignItems: "center",
       }}
     >
-      <UserModal
+      <PatientModal
         title={"Add Patient"}
         onSave={onCreateSave}
         onCancel={onCreateCancel}

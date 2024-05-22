@@ -20,7 +20,6 @@ import { drawerWidth } from "../ResponsiveDrawer";
 import CreatePatientModal from "../../components/CreatePatientModal";
 import EditPatientModal from "../../components/EditPatientModal";
 import PatientData from "../../interface/PatientData";
-// import { deleteUser, fetchUsers } from "../service/api";
 
 const PatientList = () => {
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ const PatientList = () => {
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [fetchedPatients, setFetchedPatients] = useState([]);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, signOut } = useAuth();
 
   useEffect(() => {
     document.title = "Patient List";
@@ -53,6 +52,12 @@ const PatientList = () => {
         // setRowCount(res.meta.total);
         // setTotalRowCount(res.meta.last_page);
         setPatients(res.data);
+      })
+      .catch((error) => {
+        console.log('error:', error);
+        if (error.response.statusText === "Unauthorized") {
+          signOut();
+        }
       })
       .finally(() => {
         setPatientsLoading(false);

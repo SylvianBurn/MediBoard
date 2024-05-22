@@ -4,6 +4,7 @@ import { Modal } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PatientData from "../interface/PatientData";
 import { useAuth } from "../utils/ProtectedRoute";
+import PatientModal from "./PatientModal";
 
 type EditPatientModalProps = {
   existingPatient: PatientData;
@@ -70,7 +71,7 @@ export default function EditPatientModal({
         alignItems: "center",
       }}
     >
-      <UserModal
+      <PatientModal
         title={"Edit Patient"}
         onSave={onEditSave}
         onCancel={onEditCancel}
