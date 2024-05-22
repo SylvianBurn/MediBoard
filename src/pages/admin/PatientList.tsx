@@ -12,22 +12,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { Box, Button } from "@mui/material";
-// import { UserData } from "../interface/UserDataInterface";
-// import EditUserModal from "./modal/EditUserModal";
-// import CreateUserModal from "./modal/CreateUserModal";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import { useAuth } from "../../utils/ProtectedRoute";
 import { fetchPatientsAsAdmin } from "../../utils/api";
 import { drawerWidth } from "../ResponsiveDrawer";
+import CreatePatientModal from "../../components/CreatePatientModal";
+import EditPatientModal from "../../components/EditPatientModal";
+import PatientData from "../../interface/PatientData";
 // import { deleteUser, fetchUsers } from "../service/api";
-
-export type PatientData = {
-  id: number;
-  fullName: string;
-  birthDate: string;
-  email: string;
-};
 
 const PatientList = () => {
   const navigate = useNavigate();
@@ -236,16 +229,16 @@ const PatientList = () => {
     >
       <h1>Patient management</h1>
       <div style={{ height: 600, width: "100%" }}>
-        {/* <EditUserModal
-            existingUser={user}
+        <EditPatientModal
+            existingPatient={user}
             isOpen={isEditModalOpen}
             onClose={onEditModalClose}
-            fetchUsers={handleFetchUsers}
+            fetchPatients={handleFetchPatients}
           />
-          <CreateUserModal
+          <CreatePatientModal
             isOpen={isCreateModalOpen}
             onClose={onCreateModalClose}
-          /> */}
+          />
         {fetchedPatients ? (
           <DataGrid
             slots={{
