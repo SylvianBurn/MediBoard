@@ -12,45 +12,43 @@ import {
 import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LoadingButton from '@mui/lab/LoadingButton';
+import { loginRequest } from "../utils/api";
+import { Role, useAuth } from '../utils/ProtectedRoute';
+import LoginIcon from '@mui/icons-material/Login';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const ax = axios.create();
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const {authenticateUser} = useAuth();
 
-  ax.defaults.headers.post["Content-Type"] = "application/json";
-  ax.defaults.headers.put["Content-Type"] = "application/json";
-  ax.defaults.headers.post['Access-Control-Allow-Origin'] = 'http://127.0.0.1:3333';
+  // ax.defaults.headers.post["Access-Control-Allow-Origin"] =
+  //   "http://localhost:3336";
 
   const handleLoginRequest = async (email: string, password: string) => {
-    console.log("trying to login with data:",  { email, password });
+    console.log("trying to login with data:", { email, password });
     try {
-      const data ={
-        email: email,
-        password: password,
-      };
-      const res = await ax.post("http://127.0.0.1:3333/api/auth/login", JSON.stringify(data));
+      setIsLoginLoading(true);
+      const res = await loginRequest(email, password);
+      setIsLoginLoading(false);
       if (res.status === 200) {
         console.log("res:", res);
         if (res.data.token) {
-          localStorage.setItem("token", res.data.token.token);
-          navigate('/');
+          console.log("token:", res.data.token.token);
+          authenticateUser(res.data.token.token, Role.admin);
+          // localStorage.setItem("token", res.data.token.token);
+          navigate("/");
         }
       }
     } catch (error) {
-      console.error("Error during register attempt:", error);
+      console.error("Error during login attempt:", error);
     }
   };
 
   const handleLogin = () => {
-    // console.log("email:", email, "password:", password);
-    // if (email  == "user" || password == "password") {
-    //   localStorage.setItem("token", "ThisIsAToken");
-    //   navigate("/");
-    // } else {
-    //   console.log("Wrong email or password");
-    // }
     handleLoginRequest(email, password);
   };
 
@@ -97,19 +95,22 @@ const Login = () => {
               }}
             />
 
-            <Button
+            <LoadingButton
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
               onClick={handleLogin}
+              loading={isLoginLoading}
+              loadingPosition='start'
+              startIcon={<LoginIcon />}
             >
               Login
-            </Button>
-            <Grid container justifyContent={"flex-end"}>
+            </LoadingButton>
+            {/* <Grid container justifyContent={"flex-end"}>
               <Grid item>
                 <Link to="/register">Don't have an account? Register</Link>
               </Grid>
-            </Grid>
+            </Grid> */}
           </Box>
         </Box>
       </Container>
