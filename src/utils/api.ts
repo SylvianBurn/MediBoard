@@ -18,7 +18,9 @@ ax.interceptors.response.use(
 ax.defaults.headers.post["Content-Type"] = "application/json";
 ax.defaults.headers.put["Content-Type"] = "application/json";
 
+// const api = process.env.REACT_APP_API_URL?.toString() || "http://127.0.0.1:3336";
 const api = "http://127.0.0.1:3336";
+console.log('api from env:', api);
 
 const getConfig = () => {
   var config = {

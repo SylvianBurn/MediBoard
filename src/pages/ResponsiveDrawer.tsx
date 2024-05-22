@@ -19,6 +19,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CircleIcon from "@mui/icons-material/Circle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import EditIcon from "@mui/icons-material/Edit";
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useEffect, useState } from "react";
 import MediboardLogo from "../assets/mediboard-logo.webp";
@@ -37,7 +38,8 @@ const pages: Pages[] = [
   { name: "Home", path: "/" },
   { name: "Login", path: "/login", isAuth: true },
   { name: "Register", path: "/register", isAuth: true },
-  { name: 'Patient Management', path: '/admin/patients'},
+  { name: 'Patient Management', path: '/admin/patients', isAdmin: true},
+  { name: 'Doctor Management', path: '/admin/doctors', isAdmin: true},
 ];
 
 const getIcon = (name: string): JSX.Element => {
@@ -50,6 +52,8 @@ const getIcon = (name: string): JSX.Element => {
       return <EditIcon />;
     case "Patient Management":
       return <PersonOutlineIcon />;
+    case "Doctor Management":
+      return <MedicalServicesIcon />;
     default:
       return <CircleIcon />;
   }

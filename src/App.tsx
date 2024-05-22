@@ -7,6 +7,7 @@ import { AuthProvider } from "./utils/ProtectedRoute";
 import ResponsiveDrawer from "./pages/ResponsiveDrawer";
 import { Global, css } from "@emotion/react";
 import PatientList from "./pages/admin/PatientList";
+import DoctorList from "./pages/admin/DoctorList";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin/patients" element={<PatientList />} />
+            <Route path="/admin/doctors" element={<DoctorList />} />
           </Routes>
         </div>
       </AuthProvider>
