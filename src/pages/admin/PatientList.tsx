@@ -11,11 +11,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import { useAuth } from "../../utils/ProtectedRoute";
-import { fetchPatientsAsAdmin } from "../../utils/api";
+import { deletePatient, fetchPatientsAsAdmin } from "../../utils/api";
 import { drawerWidth } from "../ResponsiveDrawer";
 import CreatePatientModal from "../../components/CreatePatientModal";
 import EditPatientModal from "../../components/EditPatientModal";
@@ -27,13 +28,14 @@ const PatientList = () => {
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [fetchedPatients, setFetchedPatients] = useState([]);
-  const { isAuthenticated, signOut } = useAuth();
+  const { isAuthenticated, role, signOut } = useAuth();
 
   useEffect(() => {
     document.title = "Patient List";
-    if (!isAuthenticated) {
+    if (!isAuthenticated || role !== "1.0") {
       navigate("/login");
     }
+    handleFetchPatients();
   }, []);
 
   // used to store the DataGrid's pagination infos
@@ -46,17 +48,17 @@ const PatientList = () => {
 
   const handleFetchPatients = (name?: string | undefined) => {
     setPatientsLoading(true);
+    //fetchPatientsAsAdmin(undefined, undefined, name)
     fetchPatientsAsAdmin(pagModel.page, pagModel.pageSize, name)
       .then((res) => {
-        console.log("fetchPatients:", res);
         // setRowCount(res.meta.total);
         // setTotalRowCount(res.meta.last_page);
         setPatients(res.data);
       })
       .catch((error) => {
-        console.log('error:', error);
         if (error.response.statusText === "Unauthorized") {
           signOut();
+          navigate("/login");
         }
       })
       .finally(() => {
@@ -66,9 +68,9 @@ const PatientList = () => {
   };
 
   // on pagination change, it fetches the user as asked by pagination
-  useEffect(() => {
-    handleFetchPatients();
-  }, [pagModel]);
+  // useEffect(() => {
+  //   handleFetchPatients();
+  // }, [pagModel]);
 
   const transformFetchedPatients = () => {
     var tmp: PatientData[] = [];
@@ -101,8 +103,8 @@ const PatientList = () => {
         return (
           <div
             style={{
-              height: '100%',
-              width: '100%',
+              height: "100%",
+              width: "100%",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -170,11 +172,30 @@ const PatientList = () => {
       setDeleteLoading(true);
       const selRow = selectedRow as PatientData;
       const patientId = selRow.id;
-      // deletePatient(patientId, signOut, navigate).then(() => {
-      //   handleClose();
-      //   handleFetchPatients();
-      // });
-      setDeleteLoading(false);
+      deletePatient(patientId.toString())
+        .then(() => {
+          handleClose();
+          handleFetchPatients();
+        })
+        .catch((error) => {
+          if (error.response.statusText === "Unauthorized") {
+            signOut();
+            navigate("/login");
+          }
+        })
+        .finally(() => {
+          setDeleteLoading(false);
+        });
+    }
+  };
+
+  const handleAssignDoctorToPatient = () => {
+    console.log('oui');
+    if (selectedRow) {
+      const selRow = selectedRow as PatientData;
+      const patientId = selRow.id;
+      console.log('blublu');
+      navigate(`/admin/patient_assign/${patientId}`);
     }
   };
 
@@ -234,16 +255,16 @@ const PatientList = () => {
     >
       <h1>Patient management</h1>
       <div style={{ height: 600, width: "100%" }}>
-        <EditPatientModal
-            existingPatient={user}
-            isOpen={isEditModalOpen}
-            onClose={onEditModalClose}
-            fetchPatients={handleFetchPatients}
-          />
-          <CreatePatientModal
-            isOpen={isCreateModalOpen}
-            onClose={onCreateModalClose}
-          />
+        {/* <EditPatientModal
+          existingPatient={user}
+          isOpen={isEditModalOpen}
+          onClose={onEditModalClose}
+          fetchPatients={handleFetchPatients}
+        /> */}
+        <CreatePatientModal
+          isOpen={isCreateModalOpen}
+          onClose={onCreateModalClose}
+        />
         {fetchedPatients ? (
           <DataGrid
             slots={{
@@ -281,7 +302,7 @@ const PatientList = () => {
           <MenuItem
             onClick={handleEdit}
             sx={{
-              width: "170px",
+              width: "200px",
             }}
           >
             <Button
@@ -293,9 +314,21 @@ const PatientList = () => {
             </Button>
           </MenuItem>
           <MenuItem
+            onClick={handleAssignDoctorToPatient}
+            sx={{ width: "200px" }}
+          >
+            <Button
+              startIcon={<AddLinkIcon />}
+              sx={{ textTransform: "capitalize" }}
+              aria-label="Assign doctors to this patient"
+            >
+              Assign to a doctor
+            </Button>
+          </MenuItem>
+          <MenuItem
             onClick={handleDelete}
             sx={{
-              width: "170px",
+              width: "200px",
             }}
           >
             <LoadingButton

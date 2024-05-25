@@ -50,7 +50,13 @@ export default function EditPatientModal({
     console.log("edit patient");
     // setLoading(true);
     // const data: EditUserInterface = buildDataObject();
-    // editUserDetails(user.id, data, signOut, navigate).finally(() => {
+    // editUserDetails(user.id, data, signOut, navigate).catch((error)=> {
+    //   if (error.response.statusText === "Unauthorized") {
+    //     signOut();
+    //     navigate('/login');
+    //   }
+    // })
+    // .finally(() => {
     //   setLoading(false);
     //   fetchPatients();
     //   onClose();

@@ -1,12 +1,17 @@
 import { Close, Save } from "@mui/icons-material";
 import { Button, TextField, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import {
+  DateField,
+  LocalizationProvider,
+  AdapterFormats,
+} from "@mui/x-date-pickers";
 
 interface PatientModalProps {
   title: string;
   fullName: string;
   email: string;
-  birthDate: string;
+  birthDate: string | undefined;
   loading: boolean;
   onFullNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
@@ -84,7 +89,6 @@ const PatientModal = ({
           sx={{ width: "220px", height: "24px" }}
           onChange={(e) => {
             onFullNameChange(e.target.value);
-            console.log('fullName', fullName);
           }}
           value={fullName}
         />
@@ -95,7 +99,6 @@ const PatientModal = ({
           onChange={(e) => {
             onEmailChange(e.target.value);
           }}
-          autoComplete={"off"}
           value={email}
           disabled={isEdit}
         />
@@ -120,13 +123,36 @@ const PatientModal = ({
             id="birthDate"
             label="Date of birth"
             type="date"
+            placeholder=""
             sx={{ width: "347px", height: "24px" }}
             onChange={(e) => {
               onBirthDateChange(e.target.value);
             }}
-            autoComplete={"off"}
             value={birthDate}
           />
+          {/* <DatePicker
+            id="birthDate"
+            label="Date of birth"
+            slotProps={{
+              textField: {
+                helperText: "DD/MM/YYYY",
+              },
+            }}
+            // onChange
+          /> */}
+          {/* <LocalizationProvider>
+            <DateField
+              label="Date of birth"
+              format="DD-MM-YYYY"
+              onChange={(newValue) => {
+                console.log("birthDate:", newValue);
+                // onBirthDateChange(newValue.toString());
+              }}
+            />
+          </LocalizationProvider> */}
+          {/* <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DateField label="Date of birth" format="DD-MM-YYYY" />
+          </LocalizationProvider> */}
         </div>
       </div>
       <div
@@ -142,10 +168,10 @@ const PatientModal = ({
         }}
       >
         <div
-          // style={{
-          //   width: "86px",
-          //   height: "42px",
-          // }}
+        // style={{
+        //   width: "86px",
+        //   height: "42px",
+        // }}
         >
           <LoadingButton
             loading={loading}
@@ -153,16 +179,16 @@ const PatientModal = ({
             startIcon={<Save />}
             variant="outlined"
             onClick={onSave}
-            disabled={fullName === "" || email === "" || birthDate === ""}
+            disabled={fullName === "" || email === ""}
           >
             <span>{title}</span>
           </LoadingButton>
         </div>
         <div
-          // style={{
-          //   width: "106px",
-          //   height: "42px",
-          // }}
+        // style={{
+        //   width: "106px",
+        //   height: "42px",
+        // }}
         >
           <Button
             startIcon={<Close />}

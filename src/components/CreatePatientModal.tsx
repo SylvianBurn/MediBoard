@@ -21,7 +21,7 @@ export default function CreatePatientModal({
     id: 0,
     fullName: "",
     email: "",
-    birthDate: "",
+    birthDate: undefined,
   });
   const [loading, setLoading] = useState(false);
   const { signOut } = useAuth();
@@ -42,11 +42,10 @@ export default function CreatePatientModal({
     createPatient(patient.fullName, patient.email, patient.birthDate)
       .then(() => {
         onClose();
-        setPatient({ id: 0, fullName: "", email: "", birthDate: "" });
+        setPatient({ id: 0, fullName: "", email: "", birthDate: undefined });
       })
       .catch((error) => {
-        console.log('err:', error);
-        if (error.errors[0].message === "Unauthorized access") {
+        if (error.response.statusText === "Unauthorized") {
           signOut();
           navigate("/login");
         }
@@ -61,7 +60,7 @@ export default function CreatePatientModal({
       id: 0,
       fullName: "",
       email: "",
-      birthDate: "",
+      birthDate: undefined,
     });
     onClose();
   };
@@ -77,7 +76,7 @@ export default function CreatePatientModal({
       }}
     >
       <PatientModal
-        title={"Add Patient"}
+        title={"Create a Patient"}
         onSave={onCreateSave}
         onCancel={onCreateCancel}
         fullName={patient.fullName}
