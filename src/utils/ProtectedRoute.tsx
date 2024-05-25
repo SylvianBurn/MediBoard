@@ -15,8 +15,9 @@ export enum Role {
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  role: Role | undefined;
-  authenticateUser: (token: string, localRole: Role) => void;
+  // role: Role | undefined;
+  role: string | undefined;
+  authenticateUser: (token: string, localRole: string) => void;
   signOut: () => void;
 }
 
@@ -24,11 +25,22 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const convertRole = (role: string): Role => {
+  switch (role) {
+    case "1.0":
+      return Role.admin;
+    case "0.0":
+      return Role.doctor;
+    default:
+      return Role.staff;
+  }
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState<undefined | Role>(undefined);
+  const [role, setRole] = useState<undefined | string>(undefined);
 
   // acts like a sort of await so the Auth check are finished before allowing the other components to render
   const [isInitialCheckComplete, setIsInitialCheckComplete] = useState(false);
@@ -39,19 +51,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const localRole = localStorage.getItem("role");
     if (storedToken && localRole) {
       console.log("got role form localstorage:", localRole);
-      authenticateUser(storedToken, Role.admin);
+      authenticateUser(storedToken, localRole);
     }
     setIsInitialCheckComplete(true);
   }, []);
 
-  const authenticateUser = (token: string, localRole: Role) => {
+  const authenticateUser = (token: string, localRole: string) => {
     const isValidToken = validateToken(token);
     console.log("isValidToken:", isValidToken);
     if (isValidToken) {
       localStorage.setItem("token", token);
       setIsAuthenticated(true);
     }
-    localStorage.setItem("role", localRole.toString());
+    localStorage.setItem("role", localRole);
     setRole(localRole);
   };
 
@@ -81,6 +93,17 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
+const isAdonisOpaqueToken = (token: string): boolean => {
+  const oatRegex = /^oat_.+$/;
+
+  return oatRegex.test(token);
+};
+
 const validateToken = (token: string | null | undefined): boolean => {
-  return token !== null && token !== undefined && token !== "";
+  return (
+    token !== null &&
+    token !== undefined &&
+    token !== "" &&
+    isAdonisOpaqueToken(token)
+  );
 };
