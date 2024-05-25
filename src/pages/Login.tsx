@@ -38,8 +38,7 @@ const Login = () => {
         console.log("res:", res);
         if (res.data.token) {
           console.log("token:", res.data.token.token);
-          authenticateUser(res.data.token.token, Role.admin);
-          // localStorage.setItem("token", res.data.token.token);
+          authenticateUser(res.data.token.token, res.data.administrator);
           navigate("/");
         }
       }
