@@ -32,6 +32,7 @@ export type Pages = {
   isAdmin?: boolean;
   isAuth?: boolean;
   isHidden?: boolean;
+  isNotAdmin?: boolean;
 };
 
 const pages: Pages[] = [
@@ -70,7 +71,8 @@ export default function ResponsiveDrawer() {
 
   const filteredPages = pages.filter((page) => {
     if (page.isAuth) return false; // Exclude auth-specific pages from sidebar
-    if (page.isAdmin && authContext.role !== Role.admin) return false; // Exclude admin pages for non-admin users
+    if (page.isAdmin && authContext.role !== "1.0") return false; // Exclude admin pages for non-admin users
+    if (page.isNotAdmin && authContext.role === "1.0") return false; // Exclude non admin pages (doctor pages) for admin users
     if (page.isHidden) return false;
     return true;
   });
@@ -130,7 +132,7 @@ export default function ResponsiveDrawer() {
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>
-            <ListItemText primary="Déconnexion" />
+            <ListItemText primary="Log out" />
           </ListItemButton>
         </ListItem>
       </List>
