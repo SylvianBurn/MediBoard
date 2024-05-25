@@ -11,16 +11,15 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import AddLinkIcon from "@mui/icons-material/AddLink";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import { useAuth } from "../../utils/ProtectedRoute";
 import { drawerWidth } from "../ResponsiveDrawer";
 import DoctorData from "../../interface/DoctorData";
-import { fetchDoctorsAsAdmin } from "../../utils/api";
-// import CreateDoctorModal from "../../components/CreateDoctorModal";
-// import EditDoctorModal from "../../components/EditDoctorModal";
-// import { deleteUser, fetchUsers } from "../service/api";
+import { deleteDoctor, fetchDoctorsAsAdmin } from "../../utils/api";
+import CreateDoctorModal from "../../components/CreateDoctorModal";
 
 const DoctorList = () => {
   const navigate = useNavigate();
@@ -28,13 +27,14 @@ const DoctorList = () => {
   const [doctorsLoading, setDoctorsLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [fetchedDoctors, setFetchedDoctors] = useState([]);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
 
   useEffect(() => {
     document.title = "Doctor List";
-    if (!isAuthenticated) {
+    if (!isAuthenticated || role !== "1.0") {
       navigate("/login");
     }
+    handleFetchDoctors();
   }, []);
 
   // used to store the DataGrid's pagination infos
@@ -47,9 +47,10 @@ const DoctorList = () => {
 
   const handleFetchDoctors = (name?: string | undefined) => {
     setDoctorsLoading(true);
+    //fetchDoctorsAsAdmin(undefined, undefined, name)
     fetchDoctorsAsAdmin(pagModel.page, pagModel.pageSize, name)
       .then((res) => {
-        console.log("fetchDoctors:", res);
+        console.log('fetchedDoctors:', res);
         // setRowCount(res.meta.total);
         // setTotalRowCount(res.meta.last_page);
         setDoctors(res.data);
@@ -61,9 +62,9 @@ const DoctorList = () => {
   };
 
   // on pagination change, it fetches the user as asked by pagination
-  useEffect(() => {
-    handleFetchDoctors();
-  }, [pagModel]);
+  // useEffect(() => {
+  //   handleFetchDoctors();
+  // }, [pagModel]);
 
   const transformFetchedDoctors = () => {
     var tmp: DoctorData[] = [];
@@ -99,8 +100,8 @@ const DoctorList = () => {
         return (
           <div
             style={{
-              height: '100%',
-              width: '100%',
+              height: "100%",
+              width: "100%",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -133,6 +134,7 @@ const DoctorList = () => {
     id: 0,
     fullName: "",
     email: "",
+    role: undefined,
   });
 
   // opens the menu when clicking on the three-dots logo from the column
@@ -161,17 +163,22 @@ const DoctorList = () => {
     }
   };
 
+  const handleAssignPatientsToDoctor = () => {};
+
   // handles the Delete button click from the selected user menu
   const handleDelete = () => {
     if (selectedRow) {
       setDeleteLoading(true);
       const selRow = selectedRow as DoctorData;
       const doctorId = selRow.id;
-      // deleteDoctor(doctorId, signOut, navigate).then(() => {
-      //   handleClose();
-      //   handleFetchDoctors();
-      // });
-      setDeleteLoading(false);
+      deleteDoctor(doctorId.toString())
+        .then(() => {
+          handleClose();
+          handleFetchDoctors();
+        })
+        .finally(() => {
+          setDeleteLoading(false);
+        });
     }
   };
 
@@ -236,11 +243,11 @@ const DoctorList = () => {
             isOpen={isEditModalOpen}
             onClose={onEditModalClose}
             fetchDoctors={handleFetchDoctors}
-          />
-          <CreateDoctorModal
-            isOpen={isCreateModalOpen}
-            onClose={onCreateModalClose}
           /> */}
+        <CreateDoctorModal
+          isOpen={isCreateModalOpen}
+          onClose={onCreateModalClose}
+        />
         {fetchedDoctors ? (
           <DataGrid
             slots={{
@@ -278,7 +285,7 @@ const DoctorList = () => {
           <MenuItem
             onClick={handleEdit}
             sx={{
-              width: "170px",
+              width: "200px",
             }}
           >
             <Button
@@ -290,9 +297,23 @@ const DoctorList = () => {
             </Button>
           </MenuItem>
           <MenuItem
+            onClick={handleAssignPatientsToDoctor}
+            sx={{
+              width: "200px",
+            }}
+          >
+            <Button
+              startIcon={<AddLinkIcon />}
+              sx={{ textTransform: "capitalize" }}
+              aria-label="Assign patients to this doctor"
+            >
+              Assign patients
+            </Button>
+          </MenuItem>
+          <MenuItem
             onClick={handleDelete}
             sx={{
-              width: "170px",
+              width: "200px",
             }}
           >
             <LoadingButton
