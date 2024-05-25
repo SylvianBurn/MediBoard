@@ -18,9 +18,11 @@ ax.interceptors.response.use(
 ax.defaults.headers.post["Content-Type"] = "application/json";
 ax.defaults.headers.put["Content-Type"] = "application/json";
 
-// const api = process.env.REACT_APP_API_URL?.toString() || "http://127.0.0.1:3336";
+
+//const api = process.env.REACT_APP_API_URL || "http://127.0.0.1:3336";
 const api = "http://127.0.0.1:3336";
-console.log('api from env:', api);
+ax.defaults.baseURL = "http://127.0.0.1:3336";
+console.log("api from env:", api);
 
 const getConfig = () => {
   var config = {
@@ -37,11 +39,11 @@ export const loginRequest = (email: string, password: string) => {
     password: password,
   };
 
-  return ax.post(`${api}/user/login`, JSON.stringify(data));
+  return ax.post(`/user/login`, JSON.stringify(data));
 };
 
 export const logoutRequest = () => {
-  return ax.post(`${api}/user/logout`, {}, getConfig());
+  return ax.post(`/user/logout`, {}, getConfig());
 };
 
 export const fetchPatientsAsAdmin = (
@@ -49,15 +51,25 @@ export const fetchPatientsAsAdmin = (
   pageSize: number,
   name?: string | undefined
 ) => {
-  var route = `${api}/admin/patient_list`;
+  var route = `/admin/patient_list`;
   const searchParams = new URLSearchParams();
+  var paramsAdded: boolean = false;
 
+  if (page) {
+    searchParams.append("page", Number(page + 1).toString());
+    paramsAdded = true;
+  }
+  if (pageSize) {
+    searchParams.append("limit", pageSize.toString());
+    paramsAdded = true;
+  }
   if (name !== undefined) {
     searchParams.append("name", name);
+    paramsAdded = true;
   }
-  searchParams.append("page", Number(page + 1).toString());
-  searchParams.append("limit", pageSize.toString());
-  route = `${route}?${searchParams.toString()}`;
+  if (paramsAdded === true) {
+    route = `${route}?${searchParams.toString()}`;
+  }
 
   return ax.get(route, getConfig());
 };
@@ -67,15 +79,25 @@ export const fetchDoctorsAsAdmin = (
   pageSize: number,
   name?: string | undefined
 ) => {
-  var route = `${api}/admin/doctor_list`;
+  var route = `/admin/doctor_list`;
   const searchParams = new URLSearchParams();
+  var paramsAdded: boolean = false;
 
+  if (page) {
+    searchParams.append("page", Number(page + 1).toString());
+    paramsAdded = true;
+  }
+  if (pageSize) {
+    searchParams.append("limit", pageSize.toString());
+    paramsAdded = true;
+  }
   if (name !== undefined) {
     searchParams.append("name", name);
+    paramsAdded = true;
   }
-  searchParams.append("page", Number(page + 1).toString());
-  searchParams.append("limit", pageSize.toString());
-  route = `${route}?${searchParams.toString()}`;
+  if (paramsAdded === true) {
+    route = `${route}?${searchParams.toString()}`;
+  }
 
   return ax.get(route, getConfig());
 };
@@ -97,7 +119,7 @@ export const createDoctor = (name: string, email: string, role?: string) => {
   }
 
   return ax.post(
-    `${api}/admin/create/doctor`,
+    `/admin/create/doctor`,
     JSON.stringify(data),
     getConfig()
   );
@@ -124,7 +146,7 @@ export const createPatient = (
   }
 
   return ax.post(
-    `${api}/admin/create/patient`,
+    `/admin/create/patient`,
     JSON.stringify(data),
     getConfig()
   );
@@ -137,7 +159,7 @@ export const assignPatientToDoctor = (doctorId: string, patientId: string) => {
   };
 
   return ax.post(
-    `${api}/admin/assign/patient_to_doctor`,
+    `/admin/assign/patient_to_doctor`,
     JSON.stringify(data),
     getConfig()
   );
@@ -153,8 +175,16 @@ export const deassignPatientToDoctor = (
   };
 
   return ax.post(
-    `${api}/admin/deassign/patient_to_doctor`,
+    `/admin/deassign/patient_to_doctor`,
     JSON.stringify(data),
     getConfig()
   );
+};
+
+export const deleteDoctor = (doctorId: string) => {
+  return ax.delete(`/admin/doctor?doctorID=${doctorId}`, getConfig());
+};
+
+export const deletePatient = (patientId: string) => {
+  return ax.delete(`/admin/patient?patientID=${patientId}`, getConfig());
 };
