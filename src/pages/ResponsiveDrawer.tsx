@@ -19,7 +19,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CircleIcon from "@mui/icons-material/Circle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import EditIcon from "@mui/icons-material/Edit";
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useEffect, useState } from "react";
 import MediboardLogo from "../assets/mediboard-logo.webp";
@@ -39,8 +39,9 @@ const pages: Pages[] = [
   { name: "Home", path: "/" },
   { name: "Login", path: "/login", isAuth: true },
   { name: "Register", path: "/register", isAuth: true },
-  { name: 'Patient Management', path: '/admin/patients', isAdmin: true},
-  { name: 'Doctor Management', path: '/admin/doctors', isAdmin: true},
+  { name: "Patient Management", path: "/admin/patients", isAdmin: true },
+  { name: "Doctor Management", path: "/admin/doctors", isAdmin: true },
+  { name: "My Patients", path: "/doctor/my_patients", isNotAdmin: true},
 ];
 
 const getIcon = (name: string): JSX.Element => {
@@ -92,7 +93,6 @@ export default function ResponsiveDrawer() {
           style={{ padding: 5, width: 200 }}
           alt="GMO Logo"
         />
-
         <p>Mediboard</p>
       </Toolbar>
       <Divider />

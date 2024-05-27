@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DataGrid,
   GridToolbarContainer,
@@ -43,7 +43,7 @@ const DoctorList = () => {
     page: 0,
   });
   const [totalRowCount, setTotalRowCount] = useState(1);
-  const [rowCount, setRowCount] = React.useState(totalRowCount || 0);
+  const [rowCount, setRowCount] = useState(totalRowCount || 0);
 
   const handleFetchDoctors = (name?: string | undefined) => {
     setDoctorsLoading(true);

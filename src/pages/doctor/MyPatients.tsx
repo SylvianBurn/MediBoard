@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../../utils/ProtectedRoute";
+import { useNavigate } from "react-router-dom";
+import { fetchPatientsAsDoctor } from "../../utils/api";
+import PatientData from "../../interface/PatientData";
 import {
   DataGrid,
   GridToolbarContainer,
@@ -12,31 +16,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-import { Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { LoadingButton } from "@mui/lab";
-import { useAuth } from "../../utils/ProtectedRoute";
-import { deletePatient, fetchPatientsAsAdmin } from "../../utils/api";
 import { drawerWidth } from "../ResponsiveDrawer";
-import CreatePatientModal from "../../components/CreatePatientModal";
-import EditPatientModal from "../../components/EditPatientModal";
-import PatientData from "../../interface/PatientData";
+import { Box } from "@mui/material";
 
-const PatientList = () => {
+const MyPatients = () => {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<PatientData[]>([]);
   const [patientsLoading, setPatientsLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [fetchedPatients, setFetchedPatients] = useState([]);
   const { isAuthenticated, role, signOut } = useAuth();
-
-  useEffect(() => {
-    document.title = "Patient List";
-    if (!isAuthenticated || role !== "1.0") {
-      navigate("/login");
-    }
-    handleFetchPatients();
-  }, []);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   // used to store the DataGrid's pagination infos
   const [pagModel, setPagModel] = useState({
@@ -46,10 +35,17 @@ const PatientList = () => {
   const [totalRowCount, setTotalRowCount] = useState(1);
   const [rowCount, setRowCount] = useState(totalRowCount || 0);
 
-  const handleFetchPatients = (name?: string | undefined) => {
+  useEffect(() => {
+    document.title = "My Patient";
+    if (!isAuthenticated || role !== "0.0") {
+      navigate("/login");
+    }
+    handleFetchMyPatients();
+  }, []);
+
+  const handleFetchMyPatients = (name?: string | undefined) => {
     setPatientsLoading(true);
-    //fetchPatientsAsAdmin(undefined, undefined, name)
-    fetchPatientsAsAdmin(pagModel.page, pagModel.pageSize, name)
+    fetchPatientsAsDoctor()
       .then((res) => {
         // setRowCount(res.meta.total);
         // setTotalRowCount(res.meta.last_page);
@@ -63,34 +59,8 @@ const PatientList = () => {
       })
       .finally(() => {
         setPatientsLoading(false);
-        transformFetchedPatients();
       });
   };
-
-  // on pagination change, it fetches the patient as asked by pagination
-  // useEffect(() => {
-  //   handleFetchPatients();
-  // }, [pagModel]);
-
-  const transformFetchedPatients = () => {
-    var tmp: PatientData[] = [];
-    const p = patients as PatientData[];
-    for (var i = 0; i < patients.length; i++) {
-      var newPatient: PatientData = {
-        id: p[i].id,
-        fullName: p[i].fullName,
-        birthDate: p[i].birthDate,
-        email: p[i].email,
-      };
-      tmp.push(newPatient);
-    }
-    setFetchedPatients(tmp as never[]);
-  };
-
-  // on patients change it transforms the received patient so they can be displayed in the DataGrid
-  useEffect(() => {
-    transformFetchedPatients();
-  }, [patients]);
 
   // defines the columns of the DataGrid
   const columns = [
@@ -122,24 +92,6 @@ const PatientList = () => {
     { field: "email", headerName: "Email", flex: 1 },
   ];
 
-  // stores the values to open the menu the menu or not on the correct row
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedRow, setSelectedRow] = useState(null);
-
-  // used to open and close the edit modal
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  // used to open and close the patient creation modal
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  // used to store the infos of the new patient to create
-  const [patient, setPatient] = useState<PatientData>({
-    id: 0,
-    fullName: "",
-    birthDate: undefined,
-    email: "",
-  });
-
   // opens the menu when clicking on the three-dots logo from the column
   const handleClick = (event: any, row: any) => {
     setAnchorEl(event.currentTarget);
@@ -150,98 +102,6 @@ const PatientList = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  // opens the edit modal with the selected patient info
-  const handleEdit = () => {
-    if (selectedRow) {
-      const selRow = selectedRow as PatientData;
-      setPatient({
-        id: selRow.id,
-        fullName: selRow.fullName,
-        birthDate: selRow.birthDate,
-        email: selRow.email,
-      });
-      setIsEditModalOpen(true);
-      handleClose();
-    }
-  };
-
-  // handles the Delete button click from the selected patient menu
-  const handleDelete = () => {
-    if (selectedRow) {
-      setDeleteLoading(true);
-      const selRow = selectedRow as PatientData;
-      const patientId = selRow.id;
-      deletePatient(patientId.toString())
-        .then(() => {
-          handleClose();
-          handleFetchPatients();
-        })
-        .catch((error) => {
-          if (error.response.statusText === "Unauthorized") {
-            signOut();
-            navigate("/login");
-          }
-        })
-        .finally(() => {
-          setDeleteLoading(false);
-        });
-    }
-  };
-
-  const handleAssignDoctorToPatient = () => {
-    if (selectedRow) {
-      const selRow = selectedRow as PatientData;
-      const p: PatientData = {
-        id: selRow.id,
-        fullName: selRow.fullName,
-        email: selRow.email,
-        birthDate: selRow.birthDate,
-      };
-      navigate(`/admin/patient_assign`, { state: p});
-    }
-  };
-
-  const onEditModalClose = () => {
-    setIsEditModalOpen(false);
-  };
-
-  const onCreateModalClose = () => {
-    setIsCreateModalOpen(false);
-    handleFetchPatients();
-  };
-
-  const handleNewUser = () => {
-    setIsCreateModalOpen(true);
-    return;
-  };
-
-  function CustomToolbar() {
-    return (
-      <>
-        <GridToolbarContainer
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <Button
-              startIcon={<AddIcon />}
-              aria-label="Add a new patient to the system"
-              onClick={() => {
-                handleNewUser();
-              }}
-            >
-              Add a new patient
-            </Button>
-            <GridToolbarFilterButton />
-          </div>
-          <GridToolbarQuickFilter />
-        </GridToolbarContainer>
-      </>
-    );
-  }
 
   return (
     <>
@@ -256,7 +116,7 @@ const PatientList = () => {
             paddingBottom: "0px",
           }}
         >
-          <h1>Patient management</h1>
+          <h1>Manage my patients</h1>
           <div style={{ height: 600, width: "100%" }}>
             {/* <EditPatientModal
       existingPatient={patient}
@@ -264,16 +124,16 @@ const PatientList = () => {
       onClose={onEditModalClose}
       fetchPatients={handleFetchPatients}
     /> */}
-            <CreatePatientModal
+            {/* <CreatePatientModal
               isOpen={isCreateModalOpen}
               onClose={onCreateModalClose}
-            />
-            {fetchedPatients ? (
+            /> */}
+            {patients ? (
               <DataGrid
-                slots={{
-                  toolbar: CustomToolbar,
-                }}
-                rows={fetchedPatients}
+                // slots={{
+                //   toolbar: CustomToolbar,
+                // }}
+                rows={patients}
                 columns={columns}
                 onCellClick={(params, event) => {
                   if (params.field === "action") {
@@ -293,7 +153,7 @@ const PatientList = () => {
                 }}
               />
             ) : null}
-            <Menu
+            {/* <Menu
               anchorEl={anchorEl}
               keepMounted
               open={Boolean(anchorEl)}
@@ -344,7 +204,7 @@ const PatientList = () => {
                   <span>Delete</span>
                 </LoadingButton>
               </MenuItem>
-            </Menu>
+            </Menu> */}
           </div>
         </Box>
       ) : null}
@@ -352,4 +212,4 @@ const PatientList = () => {
   );
 };
 
-export default PatientList;
+export default MyPatients;

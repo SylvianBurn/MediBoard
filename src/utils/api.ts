@@ -188,3 +188,7 @@ export const deleteDoctor = (doctorId: string) => {
 export const deletePatient = (patientId: string) => {
   return ax.delete(`/admin/patient?patientID=${patientId}`, getConfig());
 };
+
+export const fetchPatientsAsDoctor = () => {
+  return ax.get('/doctor/patient_list', getConfig());
+};
