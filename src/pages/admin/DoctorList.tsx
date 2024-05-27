@@ -61,7 +61,7 @@ const DoctorList = () => {
       });
   };
 
-  // on pagination change, it fetches the user as asked by pagination
+  // on pagination change, it fetches the doctor as asked by pagination
   // useEffect(() => {
   //   handleFetchDoctors();
   // }, [pagModel]);
@@ -84,7 +84,7 @@ const DoctorList = () => {
     setFetchedDoctors(tmp as never[]);
   };
 
-  // on users change it transforms the received user so they can be displayed in the DataGrid
+  // on doctors change it transforms the received doctor so they can be displayed in the DataGrid
   useEffect(() => {
     transformFetchedDoctors();
   }, [doctors]);
@@ -130,7 +130,7 @@ const DoctorList = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // used to store the infos of the new doctor to create
-  const [user, setUser] = useState<DoctorData>({
+  const [doctor, setDoctor] = useState<DoctorData>({
     id: 0,
     fullName: "",
     email: "",
@@ -152,7 +152,7 @@ const DoctorList = () => {
   const handleEdit = () => {
     if (selectedRow) {
       const selRow = selectedRow as DoctorData;
-      setUser({
+      setDoctor({
         id: selRow.id,
         fullName: selRow.fullName,
         role: selRow.role,
@@ -163,9 +163,13 @@ const DoctorList = () => {
     }
   };
 
-  const handleAssignPatientsToDoctor = () => {};
+  const handleAssignPatientsToDoctor = () => {
+    if (selectedRow) {
+      navigate('/admin/doctor_assign', {state: selectedRow})
+    }
+  };
 
-  // handles the Delete button click from the selected user menu
+  // handles the Delete button click from the selected doctor menu
   const handleDelete = () => {
     if (selectedRow) {
       setDeleteLoading(true);
@@ -239,7 +243,7 @@ const DoctorList = () => {
       <h1>Doctor management</h1>
       <div style={{ height: 600, width: "100%" }}>
         {/* <EditDoctorModal
-            existingDoctor={user}
+            existingDoctor={doctor}
             isOpen={isEditModalOpen}
             onClose={onEditModalClose}
             fetchDoctors={handleFetchDoctors}

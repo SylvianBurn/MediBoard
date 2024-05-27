@@ -3,20 +3,17 @@ import { useAuth } from "../../utils/ProtectedRoute";
 import { drawerWidth } from "../ResponsiveDrawer";
 import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import DoctorData from "../../interface/DoctorData";
 import SearchField from "../../components/SearchField";
 import { LoadingButton } from "@mui/lab";
-import { assignPatientToDoctor, fetchDoctorsAsAdmin } from "../../utils/api";
+import { assignPatientToDoctor, fetchPatientsAsAdmin } from "../../utils/api";
+import PatientData from "../../interface/PatientData";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-import { toast, Bounce } from "react-toastify";
-// import { Bounce } from "react-toastify/dist/compo";
-import MyToast from "../../components/MyToast";
 
-const PatientAssign = () => {
+const DoctorAssign = () => {
   const navigate = useNavigate();
   const { isAuthenticated, role, signOut } = useAuth();
   const { state } = useLocation();
-  const [selectedDoctor, setSelectedDoctor] = useState<DoctorData | undefined>(
+  const [selectedPatient, setSelectedPatient] = useState<PatientData | undefined>(
     undefined
   );
   const [onAssignLoading, setOnAssignLoading] = useState(false);
@@ -33,9 +30,9 @@ const PatientAssign = () => {
     }
   }, [isAuthenticated, role]);
 
-  const handleFetchDoctors = (name?: string | undefined) => {
+  const handleFetchPatients = (name?: string | undefined) => {
     setOptionsLoading(true);
-    fetchDoctorsAsAdmin(undefined, undefined, name)
+    fetchPatientsAsAdmin(undefined, undefined, name)
       .then((res) => {
         setOptions(res.data);
       })
@@ -45,13 +42,13 @@ const PatientAssign = () => {
   };
 
   useEffect(() => {
-    handleFetchDoctors();
+    handleFetchPatients();
   }, []);
 
-  const handleAssignmentToDoctor = () => {
-    if (selectedDoctor) {
+  const handleAssignmentToPatient = () => {
+    if (selectedPatient) {
       setOnAssignLoading(true);
-      assignPatientToDoctor(selectedDoctor!.id.toString(), state.id.toString())
+      assignPatientToDoctor(state.id.toString(), selectedPatient!.id.toString())
         .then((res) => {
           console.log("assign res:", res);
         })
@@ -77,29 +74,29 @@ const PatientAssign = () => {
             // paddingBottom: "0px",
           }}
         >
-          <h1>Assign a doctor to patient {state.fullName}</h1>
+          <h1>Assign a patient to doctor {state.fullName}</h1>
           <SearchField
-            label="Doctors"
+            label="Patients"
             options={options}
-            setSelected={setSelectedDoctor}
+            setSelected={setSelectedPatient}
             isOptionLoading={optionsLoading}
           />
-          {selectedDoctor ? (
+          {selectedPatient ? (
             <Typography variant="body1">
-              You are about to assign patient <strong>{state.fullName}</strong>{" "}
-              with id {state.id} to doctor{" "}
-              <strong>{selectedDoctor.fullName}</strong> with id{" "}
-              {selectedDoctor.id}
+              You are about to assign doctor <strong>{state.fullName}</strong>{" "}
+              with id {state.id} to patient{" "}
+              <strong>{selectedPatient.fullName}</strong> with id{" "}
+              {selectedPatient.id}
             </Typography>
           ) : (
             <Typography variant="body1" color="error">
-              Please select a doctor to assign to this patient
+              Please select a patient to assign to this patient
             </Typography>
           )}
           <LoadingButton
-            disabled={!selectedDoctor}
+            disabled={!selectedPatient}
             variant="outlined"
-            onClick={handleAssignmentToDoctor}
+            onClick={handleAssignmentToPatient}
             sx={{
               width: "50%",
             }}
@@ -115,4 +112,4 @@ const PatientAssign = () => {
   );
 };
 
-export default PatientAssign;
+export default DoctorAssign;

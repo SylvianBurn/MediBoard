@@ -9,6 +9,7 @@ import { Global, css } from "@emotion/react";
 import PatientList from "./pages/admin/PatientList";
 import DoctorList from "./pages/admin/DoctorList";
 import PatientAssign from "./pages/admin/PatientAssign";
+import DoctorAssign from "./pages/admin/DoctorAssign";
 
 function App() {
   return (
@@ -30,8 +31,8 @@ function App() {
             <Route path="/admin">
               <Route path="/admin/patients" element={<PatientList />} />
               <Route path="/admin/doctors" element={<DoctorList />} />
-              <Route path="/admin/patient_assign/:patientId" element={<PatientAssign />} />
-              {/* <Route path="/admin/doctor_assign" element={} /> */}
+              <Route path="/admin/patient_assign" element={<PatientAssign />} />
+              <Route path="/admin/doctor_assign" element={<DoctorAssign />} />
             </Route>
           </Routes>
         </div>

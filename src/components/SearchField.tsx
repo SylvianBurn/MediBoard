@@ -1,34 +1,15 @@
-import { Autocomplete, CircularProgress, TextField } from "@mui/material";
-import DoctorData from "../interface/DoctorData";
-import { useState, useEffect, Fragment } from "react";
-import { fetchDoctorsAsAdmin } from "../utils/api";
+import { Autocomplete, TextField } from "@mui/material";
+import { useState } from "react";
 
 type SearchFieldProps = {
-  selectedDoctor: DoctorData | undefined;
-  setSelectedDoctor: React.Dispatch<React.SetStateAction<DoctorData | undefined>>;
+  options: readonly any[];
+  setSelected: React.Dispatch<React.SetStateAction<any | undefined>>;
+  label: string;
+  isOptionLoading: boolean;
 };
 
-const SearchField = ({selectedDoctor, setSelectedDoctor}: SearchFieldProps) => {
+const SearchField = ({options, setSelected, label, isOptionLoading}: SearchFieldProps) => {
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<readonly DoctorData[]>([]);
-  // const [nameSearch, setNameSearch] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleFetchDoctors = (name?: string | undefined) => {
-    setLoading(true);
-    fetchDoctorsAsAdmin(undefined, undefined, name)
-      .then((res) => {
-        setOptions(res.data);
-      })
-      .finally(() => {
-        setLoading(false);
-        // transformFetchedDoctors();
-      });
-  };
-
-  useEffect(() => {
-    handleFetchDoctors();
-  }, []);
 
   return (
     <Autocomplete
@@ -44,17 +25,17 @@ const SearchField = ({selectedDoctor, setSelectedDoctor}: SearchFieldProps) => {
       getOptionLabel={(option) => option.fullName}
       getOptionKey={(option) => option.id}
       options={options}
-      loading={loading}
-      noOptionsText="No corresponding doctors were found in our system"
+      loading={isOptionLoading}
+      noOptionsText={`No corresponding ${label.toLowerCase()} were found in our system`}
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Doctors"
+          label={label}
         />
       )}
-      onChange={(e, v) => {
-        console.log('onChange doctor:', v);
-        setSelectedDoctor(v !== null ? v : undefined);
+      onChange={(_e, v) => {
+        console.log('onChange:', v);
+        setSelected(v !== null ? v : undefined);
       }}
     />
   );

@@ -192,14 +192,13 @@ const PatientList = () => {
   const handleAssignDoctorToPatient = () => {
     if (selectedRow) {
       const selRow = selectedRow as PatientData;
-      const patientId = selRow.id;
       const p: PatientData = {
         id: selRow.id,
         fullName: selRow.fullName,
         email: selRow.email,
         birthDate: selRow.birthDate,
       };
-      navigate(`/admin/patient_assign/${patientId}`, { state: p});
+      navigate(`/admin/patient_assign`, { state: p});
     }
   };
 
