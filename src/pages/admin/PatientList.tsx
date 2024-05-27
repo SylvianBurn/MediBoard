@@ -67,7 +67,7 @@ const PatientList = () => {
       });
   };
 
-  // on pagination change, it fetches the user as asked by pagination
+  // on pagination change, it fetches the patient as asked by pagination
   // useEffect(() => {
   //   handleFetchPatients();
   // }, [pagModel]);
@@ -87,7 +87,7 @@ const PatientList = () => {
     setFetchedPatients(tmp as never[]);
   };
 
-  // on users change it transforms the received user so they can be displayed in the DataGrid
+  // on patients change it transforms the received patient so they can be displayed in the DataGrid
   useEffect(() => {
     transformFetchedPatients();
   }, [patients]);
@@ -133,10 +133,10 @@ const PatientList = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // used to store the infos of the new patient to create
-  const [user, setUser] = useState<PatientData>({
+  const [patient, setPatient] = useState<PatientData>({
     id: 0,
     fullName: "",
-    birthDate: "",
+    birthDate: undefined,
     email: "",
   });
 
@@ -155,7 +155,7 @@ const PatientList = () => {
   const handleEdit = () => {
     if (selectedRow) {
       const selRow = selectedRow as PatientData;
-      setUser({
+      setPatient({
         id: selRow.id,
         fullName: selRow.fullName,
         birthDate: selRow.birthDate,
@@ -166,7 +166,7 @@ const PatientList = () => {
     }
   };
 
-  // handles the Delete button click from the selected user menu
+  // handles the Delete button click from the selected patient menu
   const handleDelete = () => {
     if (selectedRow) {
       setDeleteLoading(true);
@@ -190,12 +190,16 @@ const PatientList = () => {
   };
 
   const handleAssignDoctorToPatient = () => {
-    console.log('oui');
     if (selectedRow) {
       const selRow = selectedRow as PatientData;
       const patientId = selRow.id;
-      console.log('blublu');
-      navigate(`/admin/patient_assign/${patientId}`);
+      const p: PatientData = {
+        id: selRow.id,
+        fullName: selRow.fullName,
+        email: selRow.email,
+        birthDate: selRow.birthDate,
+      };
+      navigate(`/admin/patient_assign/${patientId}`, { state: p});
     }
   };
 
@@ -216,134 +220,136 @@ const PatientList = () => {
   function CustomToolbar() {
     return (
       <>
-        {isAuthenticated ? (
-          <GridToolbarContainer
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <div>
-              <Button
-                startIcon={<AddIcon />}
-                aria-label="Add a new patient to the system"
-                onClick={() => {
-                  handleNewUser();
-                }}
-              >
-                Add a new patient
-              </Button>
-              <GridToolbarFilterButton />
-            </div>
-            <GridToolbarQuickFilter />
-          </GridToolbarContainer>
-        ) : null}
+        <GridToolbarContainer
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <Button
+              startIcon={<AddIcon />}
+              aria-label="Add a new patient to the system"
+              onClick={() => {
+                handleNewUser();
+              }}
+            >
+              Add a new patient
+            </Button>
+            <GridToolbarFilterButton />
+          </div>
+          <GridToolbarQuickFilter />
+        </GridToolbarContainer>
       </>
     );
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        width: `calc(100% - ${drawerWidth}px)`,
-        paddingRight: "2%",
-        paddingLeft: "4.5%",
-        paddingTop: "72px",
-        paddingBottom: "0px",
-      }}
-    >
-      <h1>Patient management</h1>
-      <div style={{ height: 600, width: "100%" }}>
-        {/* <EditPatientModal
-          existingPatient={user}
-          isOpen={isEditModalOpen}
-          onClose={onEditModalClose}
-          fetchPatients={handleFetchPatients}
-        /> */}
-        <CreatePatientModal
-          isOpen={isCreateModalOpen}
-          onClose={onCreateModalClose}
-        />
-        {fetchedPatients ? (
-          <DataGrid
-            slots={{
-              toolbar: CustomToolbar,
-            }}
-            rows={fetchedPatients}
-            columns={columns}
-            onCellClick={(params, event) => {
-              if (params.field === "action") {
-                handleClick(event, params.row);
-              }
-            }}
-            pageSizeOptions={[5, 10, 20, 50]}
-            pagination
-            paginationMode="server"
-            paginationModel={pagModel}
-            onPaginationModelChange={setPagModel}
-            rowCount={rowCount}
-            loading={patientsLoading}
-            autoHeight
-            sx={{
-              width: "100%",
-            }}
-          />
-        ) : null}
-        <Menu
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
+    <>
+      {isAuthenticated ? (
+        <Box
+          component="main"
           sx={{
-            borderRadius: "3.121px",
+            width: `calc(100% - ${drawerWidth}px)`,
+            paddingRight: "2%",
+            paddingLeft: "4.5%",
+            paddingTop: "72px",
+            paddingBottom: "0px",
           }}
         >
-          <MenuItem
-            onClick={handleEdit}
-            sx={{
-              width: "200px",
-            }}
-          >
-            <Button
-              startIcon={<EditIcon />}
-              sx={{ textTransform: "capitalize" }}
-              aria-label="Edit the selected patient"
+          <h1>Patient management</h1>
+          <div style={{ height: 600, width: "100%" }}>
+            {/* <EditPatientModal
+      existingPatient={patient}
+      isOpen={isEditModalOpen}
+      onClose={onEditModalClose}
+      fetchPatients={handleFetchPatients}
+    /> */}
+            <CreatePatientModal
+              isOpen={isCreateModalOpen}
+              onClose={onCreateModalClose}
+            />
+            {fetchedPatients ? (
+              <DataGrid
+                slots={{
+                  toolbar: CustomToolbar,
+                }}
+                rows={fetchedPatients}
+                columns={columns}
+                onCellClick={(params, event) => {
+                  if (params.field === "action") {
+                    handleClick(event, params.row);
+                  }
+                }}
+                pageSizeOptions={[5, 10, 20, 50]}
+                pagination
+                paginationMode="server"
+                paginationModel={pagModel}
+                onPaginationModelChange={setPagModel}
+                rowCount={rowCount}
+                loading={patientsLoading}
+                autoHeight
+                sx={{
+                  width: "100%",
+                }}
+              />
+            ) : null}
+            <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              sx={{
+                borderRadius: "3.121px",
+              }}
             >
-              Edit
-            </Button>
-          </MenuItem>
-          <MenuItem
-            onClick={handleAssignDoctorToPatient}
-            sx={{ width: "200px" }}
-          >
-            <Button
-              startIcon={<AddLinkIcon />}
-              sx={{ textTransform: "capitalize" }}
-              aria-label="Assign doctors to this patient"
-            >
-              Assign to a doctor
-            </Button>
-          </MenuItem>
-          <MenuItem
-            onClick={handleDelete}
-            sx={{
-              width: "200px",
-            }}
-          >
-            <LoadingButton
-              startIcon={<DeleteIcon />}
-              color="error"
-              sx={{ textTransform: "capitalize" }}
-              aria-label="Delete the selected patient"
-              loading={deleteLoading}
-            >
-              <span>Delete</span>
-            </LoadingButton>
-          </MenuItem>
-        </Menu>
-      </div>
-    </Box>
+              <MenuItem
+                onClick={handleEdit}
+                sx={{
+                  width: "200px",
+                }}
+              >
+                <Button
+                  startIcon={<EditIcon />}
+                  sx={{ textTransform: "capitalize" }}
+                  aria-label="Edit the selected patient"
+                >
+                  Edit
+                </Button>
+              </MenuItem>
+              <MenuItem
+                onClick={handleAssignDoctorToPatient}
+                sx={{ width: "200px" }}
+              >
+                <Button
+                  startIcon={<AddLinkIcon />}
+                  sx={{ textTransform: "capitalize" }}
+                  aria-label="Assign doctors to this patient"
+                >
+                  Assign to a doctor
+                </Button>
+              </MenuItem>
+              <MenuItem
+                onClick={handleDelete}
+                sx={{
+                  width: "200px",
+                }}
+              >
+                <LoadingButton
+                  startIcon={<DeleteIcon />}
+                  color="error"
+                  sx={{ textTransform: "capitalize" }}
+                  aria-label="Delete the selected patient"
+                  loading={deleteLoading}
+                >
+                  <span>Delete</span>
+                </LoadingButton>
+              </MenuItem>
+            </Menu>
+          </div>
+        </Box>
+      ) : null}
+    </>
   );
 };
 

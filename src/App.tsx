@@ -8,6 +8,7 @@ import ResponsiveDrawer from "./pages/ResponsiveDrawer";
 import { Global, css } from "@emotion/react";
 import PatientList from "./pages/admin/PatientList";
 import DoctorList from "./pages/admin/DoctorList";
+import PatientAssign from "./pages/admin/PatientAssign";
 
 function App() {
   return (
@@ -26,8 +27,12 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin/patients" element={<PatientList />} />
-            <Route path="/admin/doctors" element={<DoctorList />} />
+            <Route path="/admin">
+              <Route path="/admin/patients" element={<PatientList />} />
+              <Route path="/admin/doctors" element={<DoctorList />} />
+              <Route path="/admin/patient_assign/:patientId" element={<PatientAssign />} />
+              {/* <Route path="/admin/doctor_assign" element={} /> */}
+            </Route>
           </Routes>
         </div>
       </AuthProvider>

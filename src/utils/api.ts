@@ -47,8 +47,8 @@ export const logoutRequest = () => {
 };
 
 export const fetchPatientsAsAdmin = (
-  page: number,
-  pageSize: number,
+  page?: number,
+  pageSize?: number,
   name?: string | undefined
 ) => {
   var route = `/admin/patient_list`;
@@ -75,8 +75,8 @@ export const fetchPatientsAsAdmin = (
 };
 
 export const fetchDoctorsAsAdmin = (
-  page: number,
-  pageSize: number,
+  page?: number,
+  pageSize?: number,
   name?: string | undefined
 ) => {
   var route = `/admin/doctor_list`;
