@@ -20,7 +20,7 @@ export default function CreateDoctorModal({
     id: 0,
     fullName: "",
     email: "",
-    role: undefined,
+    role: "",
   });
   const [loading, setLoading] = useState(false);
   const { signOut } = useAuth();
@@ -41,7 +41,7 @@ export default function CreateDoctorModal({
     createDoctor(doctor.fullName, doctor.email, doctor.role)
       .then(() => {
         onClose();
-        setDoctor({ id: 0, fullName: "", email: "", role: undefined });
+        setDoctor({ id: 0, fullName: "", email: "", role: "" });
       })
       .catch((error) => {
         if (error.response.statusText === "Unauthorized") {
@@ -59,7 +59,7 @@ export default function CreateDoctorModal({
       id: 0,
       fullName: "",
       email: "",
-      role: undefined,
+      role: "",
     });
     onClose();
   };
@@ -75,7 +75,7 @@ export default function CreateDoctorModal({
       }}
     >
       <DoctorModal
-        title={"Create a Doctor"}
+        title={"Add a Doctor"}
         onSave={onCreateSave}
         onCancel={onCreateCancel}
         fullName={doctor.fullName}

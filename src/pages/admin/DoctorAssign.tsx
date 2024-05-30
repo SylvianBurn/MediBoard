@@ -25,7 +25,7 @@ const DoctorAssign = () => {
       signOut();
       navigate("/login");
     }
-    if (role !== "1.0") {
+    if (role !== "admin") {
       navigate("/");
     }
   }, [isAuthenticated, role]);
@@ -35,6 +35,12 @@ const DoctorAssign = () => {
     fetchPatientsAsAdmin(undefined, undefined, name)
       .then((res) => {
         setOptions(res.data);
+      })
+      .catch((error) => {
+        if (error.response.statusText === "Unauthorized") {
+          signOut();
+          navigate("/login");
+        }
       })
       .finally(() => {
         setOptionsLoading(false);
@@ -51,6 +57,12 @@ const DoctorAssign = () => {
       assignPatientToDoctor(state.id.toString(), selectedPatient!.id.toString())
         .then((res) => {
           console.log("assign res:", res);
+        })
+        .catch((error) => {
+          if (error.response.statusText === "Unauthorized") {
+            signOut();
+            navigate("/login");
+          }
         })
         .finally(() => {
           setOnAssignLoading(false);
@@ -90,7 +102,7 @@ const DoctorAssign = () => {
             </Typography>
           ) : (
             <Typography variant="body1" color="error">
-              Please select a patient to assign to this patient
+              Please select a to assign to this doctor
             </Typography>
           )}
           <LoadingButton

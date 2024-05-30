@@ -27,11 +27,11 @@ const DoctorList = () => {
   const [doctorsLoading, setDoctorsLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [fetchedDoctors, setFetchedDoctors] = useState([]);
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, signOut } = useAuth();
 
   useEffect(() => {
     document.title = "Doctor List";
-    if (!isAuthenticated || role !== "1.0") {
+    if (!isAuthenticated || role !== "admin") {
       navigate("/login");
     }
     handleFetchDoctors();
@@ -55,6 +55,12 @@ const DoctorList = () => {
         // setTotalRowCount(res.meta.last_page);
         setDoctors(res.data);
       })
+      .catch((error) => {
+        if (error.response.statusText === "Unauthorized") {
+          signOut();
+          navigate("/login");
+        }
+      })
       .finally(() => {
         setDoctorsLoading(false);
         transformFetchedDoctors();
@@ -74,11 +80,9 @@ const DoctorList = () => {
         id: d[i].id,
         fullName: d[i].fullName,
         email: d[i].email,
+        role: d[i].role,
       };
 
-      if (d[i].role) {
-        newDoctor.role = d[i].role;
-      }
       tmp.push(newDoctor);
     }
     setFetchedDoctors(tmp as never[]);
@@ -134,7 +138,7 @@ const DoctorList = () => {
     id: 0,
     fullName: "",
     email: "",
-    role: undefined,
+    role: "",
   });
 
   // opens the menu when clicking on the three-dots logo from the column
@@ -179,6 +183,12 @@ const DoctorList = () => {
         .then(() => {
           handleClose();
           handleFetchDoctors();
+        })
+        .catch((error) => {
+          if (error.response.statusText === "Unauthorized") {
+            signOut();
+            navigate("/login");
+          }
         })
         .finally(() => {
           setDeleteLoading(false);

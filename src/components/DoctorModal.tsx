@@ -1,12 +1,21 @@
 import { Close, Save } from "@mui/icons-material";
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
 interface DoctorModalProps {
   title: string;
   fullName: string;
   email: string;
-  role: string | undefined;
+  role: string;
   loading: boolean;
   onFullNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
@@ -29,11 +38,19 @@ const DoctorModal = ({
   onCancel,
   isEdit = false,
 }: DoctorModalProps) => {
+  const handleChangeLocalRole = (e: SelectChangeEvent) => {
+    const value = e.target.value;
+    onRoleChange(value);
+  };
+
   return (
     <div
       style={{
         width: "680px",
         // height: "465px",
+        // display: "flex",
+        // flexDirection: "column",
+        // rowGap: "20px",
         flexShrink: 0,
         borderRadius: "30px",
         background: "#FFF",
@@ -46,9 +63,9 @@ const DoctorModal = ({
           display: "inline-flex",
           flexDirection: "column",
           alignItems: "center",
-          // marginTop: "31px",
-          // marginLeft: "47px",
-          // height: "37px",
+          marginTop: "31px",
+          marginLeft: "47px",
+          height: "37px",
           color: "rgba(0, 0, 0, 0.87)",
           fontSize: "32px",
           fontStyle: "normal",
@@ -76,6 +93,7 @@ const DoctorModal = ({
           paddingLeft: "41px",
           paddingRight: "27px",
           height: "91px",
+          // height: '100%',
         }}
       >
         <TextField
@@ -102,6 +120,7 @@ const DoctorModal = ({
         style={{
           width: "100%",
           display: "flex",
+          height: "100%",
           flexDirection: "row",
           justifyContent: "space-between",
           paddingTop: "35px",
@@ -109,21 +128,20 @@ const DoctorModal = ({
           paddingRight: "27px",
         }}
       >
-        <div
-          style={{
-            width: "220px",
-          }}
-        >
-          <TextField
-            id="role"
-            label="Role"
-            sx={{ width: "347px", height: "24px" }}
-            onChange={(e) => {
-              onRoleChange(e.target.value);
-            }}
+        <FormControl fullWidth>
+          <InputLabel id="tag-select-label">Role</InputLabel>
+          <Select
+            labelId="tag-select-label"
+            id="tag-select"
             value={role}
-          />
-        </div>
+            label="Tag"
+            onChange={handleChangeLocalRole}
+          >
+            <MenuItem value={"admin"}>Admin</MenuItem>
+            <MenuItem value={"doctor"}>Doctor</MenuItem>
+            <MenuItem value={"staff"}>Medical Staff</MenuItem>
+          </Select>
+        </FormControl>
       </div>
       <div
         style={{
@@ -132,43 +150,31 @@ const DoctorModal = ({
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingTop: "42px",
-          paddingLeft: "193px",
-          paddingRight: "196px",
+          paddingTop: "52px",
+          paddingBottom: "10px",
+          columnGap: "10px",
         }}
       >
-        <div
-        // style={{
-        //   width: "86px",
-        //   height: "42px",
-        // }}
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<Save />}
+          variant="outlined"
+          onClick={onSave}
+          disabled={fullName === "" || email === ""}
+          fullWidth
         >
-          <LoadingButton
-            loading={loading}
-            loadingPosition="start"
-            startIcon={<Save />}
-            variant="outlined"
-            onClick={onSave}
-            disabled={fullName === "" || email === ""}
-          >
-            <span>{title}</span>
-          </LoadingButton>
-        </div>
-        <div
-        // style={{
-        //   width: "106px",
-        //   height: "42px",
-        // }}
+          <span>{title}</span>
+        </LoadingButton>
+        <Button
+          startIcon={<Close />}
+          variant="outlined"
+          color="error"
+          onClick={onCancel}
+          fullWidth
         >
-          <Button
-            startIcon={<Close />}
-            variant="outlined"
-            color="error"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-        </div>
+          Cancel
+        </Button>
       </div>
     </div>
   );
