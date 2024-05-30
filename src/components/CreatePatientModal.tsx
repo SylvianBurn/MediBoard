@@ -76,7 +76,7 @@ export default function CreatePatientModal({
       }}
     >
       <PatientModal
-        title={"Create a Patient"}
+        title={"Add a Patient"}
         onSave={onCreateSave}
         onCancel={onCreateCancel}
         fullName={patient.fullName}

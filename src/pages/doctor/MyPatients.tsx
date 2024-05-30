@@ -16,8 +16,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import AddLinkIcon from "@mui/icons-material/AddLink";
+import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
 import { drawerWidth } from "../ResponsiveDrawer";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 const MyPatients = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const MyPatients = () => {
 
   useEffect(() => {
     document.title = "My Patient";
-    if (!isAuthenticated || role !== "0.0") {
+    if (!isAuthenticated || role !== "doctor") {
       navigate("/login");
     }
     handleFetchMyPatients();
@@ -47,6 +48,7 @@ const MyPatients = () => {
     setPatientsLoading(true);
     fetchPatientsAsDoctor()
       .then((res) => {
+        console.log("myPatients:", res);
         // setRowCount(res.meta.total);
         // setTotalRowCount(res.meta.last_page);
         setPatients(res.data);
@@ -103,6 +105,19 @@ const MyPatients = () => {
     setAnchorEl(null);
   };
 
+  const goToPatientDetails = () => {
+    if (selectedRow) {
+      const selRow = selectedRow as PatientData;
+      const p: PatientData = {
+        id: selRow.id,
+        fullName: selRow.fullName,
+        email: selRow.email,
+        birthDate: selRow.birthDate,
+      };
+      navigate(`/doctor/patient_details`, { state: p });
+    }
+  };
+
   return (
     <>
       {isAuthenticated ? (
@@ -119,11 +134,11 @@ const MyPatients = () => {
           <h1>Manage my patients</h1>
           <div style={{ height: 600, width: "100%" }}>
             {/* <EditPatientModal
-      existingPatient={patient}
-      isOpen={isEditModalOpen}
-      onClose={onEditModalClose}
-      fetchPatients={handleFetchPatients}
-    /> */}
+              existingPatient={patient}
+              isOpen={isEditModalOpen}
+              onClose={onEditModalClose}
+              fetchPatients={handleFetchPatients}
+            /> */}
             {/* <CreatePatientModal
               isOpen={isCreateModalOpen}
               onClose={onCreateModalClose}
@@ -153,7 +168,7 @@ const MyPatients = () => {
                 }}
               />
             ) : null}
-            {/* <Menu
+            <Menu
               anchorEl={anchorEl}
               keepMounted
               open={Boolean(anchorEl)}
@@ -162,7 +177,7 @@ const MyPatients = () => {
                 borderRadius: "3.121px",
               }}
             >
-              <MenuItem
+              {/* <MenuItem
                 onClick={handleEdit}
                 sx={{
                   width: "200px",
@@ -175,20 +190,17 @@ const MyPatients = () => {
                 >
                   Edit
                 </Button>
-              </MenuItem>
-              <MenuItem
-                onClick={handleAssignDoctorToPatient}
-                sx={{ width: "200px" }}
-              >
+              </MenuItem> */}
+              <MenuItem onClick={goToPatientDetails} sx={{ width: "200px" }}>
                 <Button
-                  startIcon={<AddLinkIcon />}
+                  startIcon={<MedicalInformationIcon />}
                   sx={{ textTransform: "capitalize" }}
-                  aria-label="Assign doctors to this patient"
+                  aria-label="Go to patient's detail page"
                 >
-                  Assign to a doctor
+                  Patient details
                 </Button>
               </MenuItem>
-              <MenuItem
+              {/* <MenuItem
                 onClick={handleDelete}
                 sx={{
                   width: "200px",
@@ -203,8 +215,8 @@ const MyPatients = () => {
                 >
                   <span>Delete</span>
                 </LoadingButton>
-              </MenuItem>
-            </Menu> */}
+              </MenuItem> */}
+            </Menu>
           </div>
         </Box>
       ) : null}

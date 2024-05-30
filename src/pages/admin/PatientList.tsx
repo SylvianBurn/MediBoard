@@ -32,7 +32,7 @@ const PatientList = () => {
 
   useEffect(() => {
     document.title = "Patient List";
-    if (!isAuthenticated || role !== "1.0") {
+    if (!isAuthenticated || role !== "admin") {
       navigate("/login");
     }
     handleFetchPatients();

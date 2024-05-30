@@ -8,9 +8,6 @@ import SearchField from "../../components/SearchField";
 import { LoadingButton } from "@mui/lab";
 import { assignPatientToDoctor, fetchDoctorsAsAdmin } from "../../utils/api";
 import AddLinkIcon from "@mui/icons-material/AddLink";
-import { toast, Bounce } from "react-toastify";
-// import { Bounce } from "react-toastify/dist/compo";
-import MyToast from "../../components/MyToast";
 
 const PatientAssign = () => {
   const navigate = useNavigate();
@@ -28,7 +25,7 @@ const PatientAssign = () => {
       signOut();
       navigate("/login");
     }
-    if (role !== "1.0") {
+    if (role !== "admin") {
       navigate("/");
     }
   }, [isAuthenticated, role]);
@@ -38,6 +35,12 @@ const PatientAssign = () => {
     fetchDoctorsAsAdmin(undefined, undefined, name)
       .then((res) => {
         setOptions(res.data);
+      })
+      .catch((error) => {
+        if (error.response.statusText === "Unauthorized") {
+          signOut();
+          navigate("/login");
+        }
       })
       .finally(() => {
         setOptionsLoading(false);
@@ -54,6 +57,12 @@ const PatientAssign = () => {
       assignPatientToDoctor(selectedDoctor!.id.toString(), state.id.toString())
         .then((res) => {
           console.log("assign res:", res);
+        })
+        .catch((error) => {
+          if (error.response.statusText === "Unauthorized") {
+            signOut();
+            navigate("/login");
+          }
         })
         .finally(() => {
           setOnAssignLoading(false);
