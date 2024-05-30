@@ -11,6 +11,7 @@ import DoctorList from "./pages/admin/DoctorList";
 import PatientAssign from "./pages/admin/PatientAssign";
 import DoctorAssign from "./pages/admin/DoctorAssign";
 import MyPatients from "./pages/doctor/MyPatients";
+import PatientDetail from "./pages/doctor/PatientDetail";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             </Route>
             <Route path="/doctor">
               <Route path="/doctor/my_patients" element={<MyPatients />} />
+              <Route path="/doctor/patient_details" element={<PatientDetail />} />
             </Route>
           </Routes>
         </div>

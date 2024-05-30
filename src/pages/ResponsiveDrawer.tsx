@@ -72,8 +72,8 @@ export default function ResponsiveDrawer() {
 
   const filteredPages = pages.filter((page) => {
     if (page.isAuth) return false; // Exclude auth-specific pages from sidebar
-    if (page.isAdmin && authContext.role !== "1.0") return false; // Exclude admin pages for non-admin users
-    if (page.isNotAdmin && authContext.role === "1.0") return false; // Exclude non admin pages (doctor pages) for admin users
+    if (page.isAdmin && authContext.role !== "admin") return false; // Exclude admin pages for non-admin users
+    if (page.isNotAdmin && authContext.role === "admin") return false; // Exclude non admin pages (doctor pages) for admin users
     if (page.isHidden) return false;
     return true;
   });

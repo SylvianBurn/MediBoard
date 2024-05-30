@@ -27,9 +27,9 @@ interface AuthProviderProps {
 
 const convertRole = (role: string): Role => {
   switch (role) {
-    case "1.0":
+    case "admin":
       return Role.admin;
-    case "0.0":
+    case "doctor":
       return Role.doctor;
     default:
       return Role.staff;
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = () => {
     setIsAuthenticated(false);
-    logoutRequest().then(() => {
+    logoutRequest().finally(() => {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
     });

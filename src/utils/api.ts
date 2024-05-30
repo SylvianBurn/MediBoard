@@ -105,18 +105,15 @@ export const fetchDoctorsAsAdmin = (
 export interface DoctorCreationData {
   fullName: string;
   email: string;
-  role?: string | undefined;
+  role: string;
 }
 
-export const createDoctor = (name: string, email: string, role?: string) => {
+export const createDoctor = (name: string, email: string, role: string) => {
   var data: DoctorCreationData = {
     fullName: name,
     email: email,
+    role: role
   };
-
-  if (role) {
-    data.role = role;
-  }
 
   return ax.post(
     `/admin/create/doctor`,
@@ -191,4 +188,12 @@ export const deletePatient = (patientId: string) => {
 
 export const fetchPatientsAsDoctor = () => {
   return ax.get('/doctor/patient_list', getConfig());
+};
+
+export const fetchPatientMedicalRecord = (patientId: string) => {
+  return ax.get(`/patient/records?patientID=${patientId}`, getConfig());
+};
+
+export const fetchPatientAnalysis = (patientId: string) => {
+  return ax.get(`/patient/ai_analysis?patientID=${patientId}`, getConfig());
 };
