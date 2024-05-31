@@ -197,3 +197,7 @@ export const fetchPatientMedicalRecord = (patientId: string) => {
 export const fetchPatientAnalysis = (patientId: string) => {
   return ax.get(`/patient/ai_analysis?patientID=${patientId}`, getConfig());
 };
+
+export const fetchDoctorsAssignedPatient = (patientId: string) => {
+  return ax.get(`/admin/doctor_patients?doctorID=${patientId}`, getConfig());
+};

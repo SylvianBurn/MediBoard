@@ -1,11 +1,16 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../utils/ProtectedRoute";
 import { drawerWidth } from "../ResponsiveDrawer";
-import { Box, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import SearchField from "../../components/SearchField";
 import { LoadingButton } from "@mui/lab";
-import { assignPatientToDoctor, fetchPatientsAsAdmin } from "../../utils/api";
+import {
+  assignPatientToDoctor,
+  deassignPatientToDoctor,
+  fetchDoctorsAssignedPatient,
+  fetchPatientsAsAdmin,
+} from "../../utils/api";
 import PatientData from "../../interface/PatientData";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 
@@ -13,12 +18,13 @@ const DoctorAssign = () => {
   const navigate = useNavigate();
   const { isAuthenticated, role, signOut } = useAuth();
   const { state } = useLocation();
-  const [selectedPatient, setSelectedPatient] = useState<PatientData | undefined>(
-    undefined
-  );
+  const [selectedPatient, setSelectedPatient] = useState<
+    PatientData | undefined
+  >(undefined);
   const [onAssignLoading, setOnAssignLoading] = useState(false);
   const [options, setOptions] = useState<readonly any[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(false);
+  const [assignedPatients, setAssignedPatients] = useState<PatientData[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -47,8 +53,18 @@ const DoctorAssign = () => {
       });
   };
 
+  const handleFetchAssignedPatient = () => {
+    if (state && state.id) {
+      fetchDoctorsAssignedPatient(state.id).then((res) => {
+        console.log("assignedPatients:", res);
+        setAssignedPatients(res.data);
+      });
+    }
+  };
+
   useEffect(() => {
     handleFetchPatients();
+    handleFetchAssignedPatient();
   }, []);
 
   const handleAssignmentToPatient = () => {
@@ -57,6 +73,7 @@ const DoctorAssign = () => {
       assignPatientToDoctor(state.id.toString(), selectedPatient!.id.toString())
         .then((res) => {
           console.log("assign res:", res);
+          handleFetchAssignedPatient();
         })
         .catch((error) => {
           if (error.response.statusText === "Unauthorized") {
@@ -68,6 +85,13 @@ const DoctorAssign = () => {
           setOnAssignLoading(false);
         });
     }
+  };
+
+  const handleUnassign = (patientId: number) => {
+    deassignPatientToDoctor(state.id, patientId.toString()).then((res) => {
+      console.log("deassignRes:", res);
+      handleFetchAssignedPatient();
+    });
   };
 
   return (
@@ -87,6 +111,32 @@ const DoctorAssign = () => {
           }}
         >
           <h1>Assign a patient to doctor {state.fullName}</h1>
+          {assignedPatients.length > 0 ? (
+            <>
+              <Typography variant="h5">Your patients:</Typography>
+              <Stack direction="row" spacing={1}>
+                {assignedPatients.map((pat) => {
+                  return (
+                    <Chip
+                      label={pat.fullName}
+                      variant="outlined"
+                      onDelete={() => {
+                        handleUnassign(pat.id);
+                      }}
+                    />
+                  );
+                })}
+              </Stack>
+              <div
+                style={{
+                  height: "1px",
+                  width: "50%",
+                  border: "1px solid black",
+                  borderRadius: '5px',
+                }}
+              ></div>
+            </>
+          ) : null}
           <SearchField
             label="Patients"
             options={options}
