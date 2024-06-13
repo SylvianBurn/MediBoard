@@ -137,7 +137,6 @@ const DoctorModal = ({
             label="Tag"
             onChange={handleChangeLocalRole}
           >
-            <MenuItem value={"admin"}>Admin</MenuItem>
             <MenuItem value={"doctor"}>Doctor</MenuItem>
             <MenuItem value={"staff"}>Medical Staff</MenuItem>
           </Select>
