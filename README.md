@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Before Running
+
+You need to create a .env file at the root of the repository.
+You shall copy all environment variables from the .env.sample file into .env file.
+Then set the variables accordingly to your setup:
+- `REACT_APP_API_URL`: set the url address of your server
+
+Once you have set the environment variables, you will now be able to serve the application locally using the `npm start` command.
+
 ## Available Scripts
 
 In the project directory, you can run:
